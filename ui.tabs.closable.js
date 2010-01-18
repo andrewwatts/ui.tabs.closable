@@ -1,15 +1,10 @@
 /*!
- * 
  * Copyright (c) 2010 Andrew Watts
  *
  * Dual licensed under the MIT (MIT_LICENSE.txt)
  * and GPL (GPL_LICENSE.txt) licenses
  * 
- * http://github.com/andrewwatts/
- *
- * Depends:
- *     jquery-ui
- * 
+ * http://github.com/andrewwatts/ui.tabs.closable
  */
 (function() {
     

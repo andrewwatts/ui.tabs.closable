@@ -19,12 +19,9 @@ How To Use
    overview at the [jQuery UI Tabs][jQuery UI Tabs] site to get an idea of
    what is possible. 
 1. Include the javascript file in your html file or js loader. eg:
-
-    `<script type="text/javascript" src="ui.tabs.closable.min.js"></script>`
-    
-2. add a closable option when instatiating the tabs:
-
-    `$('#tabs').tabs({closable: true})`
+        <script type="text/javascript" src="ui.tabs.closable.min.js"></script>
+2. add a `closable` option when instatiating the tabs:
+        $('#tabs').tabs({closable: true})
     
 That's it, about as unobtrusive as I could make it.
 
