@@ -22,6 +22,15 @@ How To Use
         <script type="text/javascript" src="ui.tabs.closable.min.js"></script>
 2. add a `closable` option when instatiating the tabs:
         $('#tabs').tabs({closable: true})
+3. (optional) If you wish to receive a callback when the close button is 
+   clicked you can add a `closableClick` function to the tab options:
+        $('#tabs').tabs({
+            closable: true,
+            closableClick: function(event, ui) {
+                // return true to allow the remove of the tab
+                // return false to prevent the remove
+            }
+        });
     
 That's it, about as unobtrusive as I could make it.
 
