@@ -26,7 +26,7 @@ $.extend($.ui.tabs.prototype, {
             });
 
             // append the close button and associated events
-            unclosable_lis.each(function() {
+            unclosable_lis.not('.tab-notclosable').each(function() {
                 $(this)
                     .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
                     .find('a:last')
