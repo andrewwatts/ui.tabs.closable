@@ -31,7 +31,7 @@ How To Use
                 // return false to prevent the remove
             }
         });
-4. (optional) If you wish to only target specific tabs as closable, add a 'closableClass'
+4. (optional) If you wish to only target specific tabs as closable, add a `closableClass`
    option when instantiating the tabs:
    	$('#tabs').tabs({closableClass: 'closable'})
     
