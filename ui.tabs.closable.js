@@ -1,65 +1,114 @@
-/*!
- * Copyright (c) 2010 Andrew Watts
- *
- * Dual licensed under the MIT (MIT_LICENSE.txt)
- * and GPL (GPL_LICENSE.txt) licenses
- * 
- * http://github.com/andrewwatts/ui.tabs.closable
- */
-(function() {
+var TabPanel = function() {
+	return {
+		activateTab: function(panelId, tabId) {
+			var tabPanelId = "#" + panelId;
+			var fullTabId = "#" + tabId;
 
-var ui_tabs_tabify = jQuery.ui.tabs.prototype._tabify;
+			// show tab link
+			$j(fullTabId).show();
 
-jQuery.extend(jQuery.ui.tabs.prototype, {
+			// fire tab select and load zone
+			var tabFound = TabPanel.selectTabByIndex(tabPanelId, fullTabId);
+			if(tabFound) {
+				var zoneId = $j(tabPanelId + "> .t-zone").attr("id");
+				var linkHref = $j(fullTabId + ' a').data('href.tabs');
 
-	_tabify: function() {
-		var self = this;
-
-		ui_tabs_tabify.apply(this, arguments);
-
-		// if closable tabs are enable, add a close button
-		if (self.options.closable === true) {
-
-			var unclosable_lis = this.lis.filter(function() {
-				// return the lis that do not have a close button
-				return jQuery('span.ui-icon-circle-close', this).length === 0;
-			});
-
-			// append the close button and associated events
-			unclosable_lis.each(function() {
-				if (!self.options.closableClass || jQuery(this).hasClass(self.options.closableClass)) {
-					jQuery(this)
-						.append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
-						.find('a:last')
-							.hover(
-								function() {
-									jQuery(this).css('cursor', 'pointer');
-								},
-								function() {
-									jQuery(this).css('cursor', 'default');
-								}
-							)
-							.click(function() {
-								var index = self.lis.index(jQuery(this).parent());
-								if (index > -1) {
-									// call _trigger to see if remove is allowed
-									if (false === self._trigger("closableClick", null, self._ui( jQuery(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
-
-									if (self.options.beforeClose) {
-										self._trigger('beforeClose', null, self._ui(jQuery(self.lis[index]).find( "a" )[ 0 ], self.panels[index]) );
-									}
-									// remove this tab
-									self.remove(index)
-								}
-
-								// don't follow the link
-								return false;
-							})
-						.end();
-				}
-			});
+				TabPanel.updateTabZone(zoneId, linkHref);
+			}
+		},
+		selectTabByIndex: function(tabPanelId, activeTabId) {
+			var index = $j(tabPanelId + ' li').index($j(activeTabId));
+			if(index != -1) {
+				$j(tabPanelId).tabs("select", index);
+				return true;
+			}
+			return false;
+		},
+		updateTabZone: function(zoneId, updateUrl) {
+			var zone = Tapestry.findZoneManagerForZone(zoneId);
+			if (!zone) return;
+			zone.updateFromURL(updateUrl);
 		}
 	}
-});
+}();
 
-})(jQuery);
+Tapestry.Initializer.Tabs = function(spec) {
+	var tabPanelId = spec.tabPanelId;
+	var config = {
+		cache: false,
+		closable: true,
+		closableClass: 'closable',
+		closableClick: function(event, ui) {
+			var closeActionUrl = $j(ui.tab).parent().data('closeActionUrl');
+			if (closeActionUrl) {
+				Tapestry.ajaxRequest(closeActionUrl);
+			}
+
+			var tabId = $j(ui.tab).parent().attr("id");
+			if (tabId === $j('#'+tabPanelId).data('activeTabId')) {
+				$j('#'+tabPanelId).bind('widen:tabActivate', function(event, eventParams) {
+					$j(this).unbind(event);
+					var zoneInfo = $j('#'+eventParams.tabId).data('tabZoneInfo');
+					TabPanel.updateTabZone(zoneInfo.zoneId, zoneInfo.updateUrl);
+				});
+			}
+
+			return true;
+		},
+		ajaxOptions: {
+			beforeSend : function() {
+				return false;
+			}
+		},
+		select : function(event, ui) {
+			var activePanelId = $j(ui.panel).parent().attr("id");
+			var activeTabId = $j(ui.tab).parent().attr("id");
+
+			$j("#"+activeTabId).show();
+			$j('#'+activePanelId).data('activeTabId', activeTabId);
+
+			/* let serverside know what the new active tab is */
+			Tapestry.ajaxRequest(spec.selectTabUrl, {
+				parameters : {
+					tabPanelId : activePanelId,
+					tabId: activeTabId
+				}
+			});
+
+			var zoneId = '#' + $j('#'+tabPanelId + "> .t-zone").attr("id");
+			$j(zoneId).empty().prepend($j('.tabLoadingIcon').clone().show());
+			var triggerTabRenderEvent = function(event) {
+				$j(document).trigger('widen:tabRender',
+					[{ tabPanelId: event.data.tabPanelId, tabId: event.data.tabId}] );
+				$j(this).unbind(event);
+			};
+			$j(zoneId).bind(Tapestry.ZONE_UPDATED_EVENT,
+				{tabPanelId: activePanelId, tabId: activeTabId}, triggerTabRenderEvent);
+
+			/* let other components like accordion know what tab is active */
+			$j('#'+activeTabId).trigger('widen:tabActivate', [{ tabPanelId: activePanelId, tabId: activeTabId }] );
+		}
+	};
+
+	/* make tabs component */
+	var $jtabs = $j('#'+tabPanelId).tabs(config);
+
+	/* find the active tab <a href></a> and activate it - use id on <li> */
+	if(spec.activeTabId) {
+		TabPanel.selectTabByIndex('#'+tabPanelId, "#" + spec.activeTabId);
+	}
+};
+
+/* activates the zone for first tab render or on tab eventclick */
+Tapestry.Initializer.Tab = function(spec) {
+	if (spec.triggerZoneUpdate) {
+		TabPanel.updateTabZone(spec.zoneId, spec.updateUrl);
+	}
+
+	$j('#'+spec.tabId).data("tabZoneInfo", {
+		zoneId : spec.zoneId,
+		updateUrl : spec.updateUrl
+	});
+
+	$j('#'+spec.tabId).data("closeActionUrl", spec.closeActionUrl);
+};
