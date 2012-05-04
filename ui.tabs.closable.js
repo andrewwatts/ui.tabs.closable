@@ -45,8 +45,23 @@ jQuery.extend(jQuery.ui.tabs.prototype, {
 									// call _trigger to see if remove is allowed
 									if (false === self._trigger("closableClick", null, self._ui( jQuery(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
 
-									// remove this tab
-									self.remove(index)
+									if (self.options.hideOnClose) {
+										//hide tab, instead of removing it
+										var tab = jQuery(self.lis[index]);
+										tab.hide();
+
+										if (tab.hasClass('ui-state-active')) {
+											var numTabs = self.length();
+											if (numTabs > 1) {
+												var nextTabIndex = index == numTabs-1 ? index-1 : index+1;
+												self.select(nextTabIndex);
+											}
+										}
+									}
+									else {
+										// remove this tab
+										self.remove(index)
+									}
 								}
 
 								// don't follow the link

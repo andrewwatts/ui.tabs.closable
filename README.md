@@ -34,6 +34,8 @@ How To Use
 4. (optional) If you wish to only target specific tabs as closable, add a `closableClass`
    option when instantiating the tabs:
    	$('#tabs').tabs({closableClass: 'closable'})
+5. (optional) If you wish to have the plugin hide tabs on close, instead of removing them
+   from the DOM, set the `hideOnClose` option to `true`.  
     
 That's it, about as unobtrusive as I could make it.
 
