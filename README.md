@@ -20,7 +20,7 @@ How To Use
    what is possible. 
 1. Include the javascript file in your html file or js loader. eg:
         <script type="text/javascript" src="ui.tabs.closable.min.js"></script>
-2. add a `closable` option when instatiating the tabs:
+2. add a `closable` option when instantiating the tabs:
         $('#tabs').tabs({closable: true})
 3. (optional) If you wish to receive a callback when the close button is 
    clicked you can add a `closableClick` function to the tab options:
@@ -31,6 +31,11 @@ How To Use
                 // return false to prevent the remove
             }
         });
+4. (optional) If you wish to only target specific tabs as closable, add a `closableClass`
+   option when instantiating the tabs:
+   	$('#tabs').tabs({closableClass: 'closable'})
+5. (optional) If you wish to have the plugin hide tabs on close, instead of removing them
+   from the DOM, set the `hideOnClose` option to `true`.
     
 That's it, about as unobtrusive as I could make it.
 
