@@ -6,11 +6,11 @@
  * 
  * http://github.com/andrewwatts/ui.tabs.closable
  */
-(function() {
+(function($) {
 
-var ui_tabs_tabify = jQuery.ui.tabs.prototype._tabify;
+var ui_tabs_tabify = $.ui.tabs.prototype._tabify;
 
-jQuery.extend(jQuery.ui.tabs.prototype, {
+$.extend($.ui.tabs.prototype, {
 
 	_tabify: function() {
 		var self = this;
@@ -22,32 +22,32 @@ jQuery.extend(jQuery.ui.tabs.prototype, {
 
 			var unclosable_lis = this.lis.filter(function() {
 				// return the lis that do not have a close button
-				return jQuery('span.ui-icon-circle-close', this).length === 0;
+				return $('span.ui-icon-circle-close', this).length === 0;
 			});
 
 			// append the close button and associated events
 			unclosable_lis.each(function() {
-				if (!self.options.closableClass || jQuery(this).hasClass(self.options.closableClass)) {
-					jQuery(this)
+				if (!self.options.closableClass || $(this).hasClass(self.options.closableClass)) {
+					$(this)
 						.append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
 						.find('a:last')
 							.hover(
 								function() {
-									jQuery(this).css('cursor', 'pointer');
+									$(this).css('cursor', 'pointer');
 								},
 								function() {
-									jQuery(this).css('cursor', 'default');
+									$(this).css('cursor', 'default');
 								}
 							)
 							.click(function() {
-								var index = self.lis.index(jQuery(this).parent());
+								var index = self.lis.index($(this).parent());
 								if (index > -1) {
 									// call _trigger to see if remove is allowed
-									if (false === self._trigger("closableClick", null, self._ui( jQuery(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
+									if (false === self._trigger("closableClick", null, self._ui( $(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
 
 									if (self.options.hideOnClose) {
 										//hide tab, instead of removing it
-										var tab = jQuery(self.lis[index]);
+										var tab = $(self.lis[index]);
 										tab.hide();
 
 										if (tab.hasClass('ui-state-active')) {
