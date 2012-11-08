@@ -20,15 +20,15 @@ $.extend($.ui.tabs.prototype, {
         // if closable tabs are enable, add a close button
         if (self.options.closable === true) {
 
-            var unclosable_lis = this.lis.filter(function() {
-                // return the lis that do not have a close button
-                return $('span.ui-icon-circle-close', this).length === 0;
-            });
-
             // append the close button and associated events
-            unclosable_lis.each(function() {
+            this.lis.each(function() {
                 $(this)
-                    .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
+                    .filter(function() {
+		                // return the lis that do not have a close button
+		                return $('span.ui-icon-circle-close', this).length === 0;
+		            })
+                    	.append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
+                    .end()
                     .find('a:last')
                         .hover(
                             function() {
