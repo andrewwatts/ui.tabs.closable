@@ -7,28 +7,29 @@
  * http://github.com/andrewwatts/ui.tabs.closable
  */
 (function() {
-    
-var ui_tabs_tabify = $.ui.tabs.prototype._tabify;
+
+var ui_tabs_parent = $.ui.tabs.prototype._refresh?$.ui.tabs.prototype._refresh:$.ui.tabs.prototype._tabify;
 
 $.extend($.ui.tabs.prototype, {
 
-    _tabify: function() {
-        var self = this;
-
-        ui_tabs_tabify.apply(this, arguments);
+    _refresh: function() {
+        var self = this,
+            lis = this.tablist?this.tablist.children( ":has(a[href])" ):this.lis;
+		
+        ui_tabs_parent.apply(this, arguments);
 
         // if closable tabs are enable, add a close button
         if (self.options.closable === true) {
 
-            var unclosable_lis = this.lis.filter(function() {
-                // return the lis that do not have a close button
-                return $('span.ui-icon-circle-close', this).length === 0;
-            });
-
             // append the close button and associated events
-            unclosable_lis.each(function() {
+            lis.each(function() {
                 $(this)
-                    .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
+                	.filter(function() {
+		                // return the lis that do not have a close button
+		                return $('span.ui-icon-circle-close', this).length === 0;
+		            })
+                        .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
+                    .end()
                     .find('a:last')
                         .hover(
                             function() {
@@ -38,22 +39,28 @@ $.extend($.ui.tabs.prototype, {
                                 $(this).css('cursor', 'default');
                             }
                         )
-                        .click(function() {
-                            var index = self.lis.index($(this).parent());
+                        .click(function(ev) {
+                            var index = lis.index($(this).parent());
+                            
+                            // don't follow the link
+                            ev.preventDefault();
+                            
                             if (index > -1) {
                                 // call _trigger to see if remove is allowed
-                                if (false === self._trigger("closableClick", null, self._ui( $(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
+                                if (false === self._trigger("closableClick", null, self._ui( $(lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
 
                                 // remove this tab
                                 self.remove(index)
                             }
-
-                            // don't follow the link
-                            return false;
                         })
                     .end();
             });
         }
+    },
+    
+    // For jQueryUI 1.8 backwards compatibility only
+    _tabify: function() {
+        this._refresh.apply(this, arguments);
     }
 });
     
