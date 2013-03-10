@@ -8,9 +8,9 @@
  */
 (function() {
     
-var ui_tabs_tabify = $.ui.tabs.prototype._tabify;
+var ui_tabs_tabify = jQuery.ui.tabs.prototype._tabify;
 
-$.extend($.ui.tabs.prototype, {
+jQuery.extend($.ui.tabs.prototype, {
 
     _tabify: function() {
         var self = this;
@@ -27,25 +27,28 @@ $.extend($.ui.tabs.prototype, {
 
             // append the close button and associated events
             unclosable_lis.each(function() {
-                $(this)
+                jQuery(this)
                     .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
                     .find('a:last')
                         .hover(
                             function() {
-                                $(this).css('cursor', 'pointer');
+                                jQuery(this).css('cursor', 'pointer');
                             },
                             function() {
-                                $(this).css('cursor', 'default');
+                                jQuery(this).css('cursor', 'default');
                             }
                         )
                         .click(function() {
                             var index = self.lis.index($(this).parent());
                             if (index > -1) {
-                                // call _trigger to see if remove is allowed
-                                if (false === self._trigger("closableClick", null, self._ui( $(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
+                                // enabling support for beforeClose event
+                                if (false === self._trigger("beforeClose", null, self._ui( jQuery(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
 
                                 // remove this tab
                                 self.remove(index)
+                                
+                                // triggering afterClose event
+                                self._trigger("afterClose", null, self._ui( jQuery(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ));
                             }
 
                             // don't follow the link
