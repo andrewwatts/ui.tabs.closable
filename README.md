@@ -1,4 +1,3 @@
-
 Closable Tabs for jQuery UI
 =============================
 
@@ -32,7 +31,7 @@ How To Use
             }
         });
     
-That's it, about as unobtrusive as I could make it.
+checking
 
 
 [demo]: http://andrew.io/playpen/ui.tabs.closable/demo/
