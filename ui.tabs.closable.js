@@ -1,35 +1,68 @@
 /*!
  * Copyright (c) 2010 Andrew Watts
+ * Copyright (c) 2013 Roman Shestakov
  *
  * Dual licensed under the MIT (MIT_LICENSE.txt)
  * and GPL (GPL_LICENSE.txt) licenses
- * 
- * http://github.com/andrewwatts/ui.tabs.closable
+ *
+ * a version of closable tabs control for jQuery UI 1.9
+ * forked from the original version for jQuery 1.8
+ * from repo http://github.com/andrewwatts/ui.tabs.closable
+ * extended by R.Shestakov - http://github.com/RomanShestakov/ui.tabs.closable.git
+ * also with added a "Loading.." indicator
+ * copied from gist - https://gist.github.com/scottgonzalez/962848
  */
+
 (function() {
-    
-var ui_tabs_tabify = $.ui.tabs.prototype._tabify;
+    $.widget( "ui.tabs", $.ui.tabs, {
+	options: {
+	    spinner: "<em>Loading&#8230;</em>",
+	    closable: false
+	},
+	_create: function() {
+	    this._super( "_create" );
+	    this._on({
+		tabsbeforeload: function( event, ui ){
+		    if( !this.options.spinner ) {
+			return;
+		    }
+		    var span = ui.tab.find( "span" ),
+		    html = span.html();
+		    span.html( this.options.spinner );
+		    ui.jqXHR.complete(function() {
+			span.html( html );
+		    });
+		}
+	    });
+	},
 
-$.extend($.ui.tabs.prototype, {
+	_removeTab: function( index ) {
+	    index = this._getIndex( index );
+	    var options = this.options;
+	    tab = this.tabs.eq( index ).remove(),
+	    panel = this._getPanelForTab( tab ).remove();
 
-    _tabify: function() {
-        var self = this;
+	    if( tab.hasClass( "ui-tabs-active" ) && this.anchors.length > 2 ) {
+		this._activate( index + ( index + 1 < this.anchors.length ? 1 : -1 ));
+	    }
+	},
 
-        ui_tabs_tabify.apply(this, arguments);
+	_processTabs: function() {
+	    this._super( "_processTabs" );
+	    var self = this;
+	    var lis = this.tablist.children( ":has(a[href])" );
 
-        // if closable tabs are enable, add a close button
-        if (self.options.closable === true) {
+	    if (this.options.closable === true) {
+		var unclosable_lis = lis.filter(function() {
+                    // return the lis that do not have a close button
+                    return $('span.ui-icon-circle-close', this).length === 0;
+		});
 
-            var unclosable_lis = this.lis.filter(function() {
-                // return the lis that do not have a close button
-                return $('span.ui-icon-circle-close', this).length === 0;
-            });
-
-            // append the close button and associated events
-            unclosable_lis.each(function() {
-                $(this)
-                    .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
-                    .find('a:last')
+		// append the close button and associated events
+		unclosable_lis.each(function() {
+                    $(this)
+			.append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
+			.find('a:last')
                         .hover(
                             function() {
                                 $(this).css('cursor', 'pointer');
@@ -39,22 +72,18 @@ $.extend($.ui.tabs.prototype, {
                             }
                         )
                         .click(function() {
-                            var index = self.lis.index($(this).parent());
+                            var index = lis.index($(this).parent());
                             if (index > -1) {
-                                // call _trigger to see if remove is allowed
-                                if (false === self._trigger("closableClick", null, self._ui( $(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
-
                                 // remove this tab
-                                self.remove(index)
+                                self._removeTab(index);
                             }
-
                             // don't follow the link
                             return false;
                         })
-                    .end();
-            });
-        }
-    }
-});
-    
+			.end();
+		});
+	    }
+	}
+    });
+
 })(jQuery);
