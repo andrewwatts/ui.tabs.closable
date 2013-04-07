@@ -54,25 +54,26 @@
 
 	    if (this.options.closable === true) {
 		var unclosable_lis = lis.filter(function() {
-                    // return the lis that do not have a close button
-                    return $('span.ui-icon-circle-close', this).length === 0;
+                    return $('.ui-closable-tab', this).length === 0;
 		});
 
 		// append the close button and associated events
 		unclosable_lis.each(function() {
                     $(this)
-			.append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
-			.find('a:last')
+			.append('<a href="#"><span class="ui-icon ui-icon-circle-close ui-closable-tab"></span></a>')
+			.find('a:last .ui-closable-tab')
                         .hover(
                             function() {
+				$(this).addClass('ui-state-hover');
                                 $(this).css('cursor', 'pointer');
                             },
                             function() {
                                 $(this).css('cursor', 'default');
+				$(this).removeClass('ui-state-hover');
                             }
                         )
                         .click(function() {
-                            var index = lis.index($(this).parent());
+                            var index = lis.index($(this).parent().parent());
                             if (index > -1) {
                                 // remove this tab
                                 self._removeTab(index);
