@@ -44,7 +44,8 @@
 
 	    if( tab.hasClass( "ui-tabs-active" ) && this.anchors.length > 2 ) {
 		this._activate( index + ( index + 1 < this.anchors.length ? 1 : -1 ));
-	    }
+	    };
+	    this._refresh();
 	},
 
 	_processTabs: function() {
@@ -70,12 +71,13 @@
                                 $(this).css('cursor', 'pointer');
                             },
                             function() {
-                                $(this).css('cursor', 'default');
 				$(this).removeClass('ui-icon-circle-triangle-e');
+				$(this).css('cursor', 'default');
                             }
                         )
-                        .click(function() {
-                            var index = lis.index($(this).parent().parent());
+                        .click(function(e) {
+			    e.preventDefault();
+                            var index = lis.index($(e.delegateTarget).parent().parent());
                             if (index > -1) {
                                 // remove this tab
                                 self._removeTab(index);
@@ -88,5 +90,4 @@
 	    }
 	}
     });
-
 })(jQuery);
