@@ -38,14 +38,18 @@
 
 	_removeTab: function( index ) {
 	    index = this._getIndex( index );
-	    var options = this.options;
-	    tab = this.tabs.eq( index ).remove(),
+	    tab = this.tabs.eq( index ).remove();
+	    // permanently remove the tab
+	    this.tabs.splice( index, 1 );
+	    // remove a panel
 	    panel = this._getPanelForTab( tab ).remove();
-
-	    if( tab.hasClass( "ui-tabs-active" ) && this.anchors.length > 2 ) {
-		this._activate( index + ( index + 1 < this.anchors.length ? 1 : -1 ));
+	    // select a tab
+	    if( tab.hasClass( "ui-tabs-active" ) && this.tabs.length > 2 ) {
+	    	this._activate( index + ( index + 1 < this.tabs.length ? 1 : -1 ));
 	    };
+
 	    this._refresh();
+	    return this;
 	},
 
 	_processTabs: function() {
@@ -76,14 +80,16 @@
                             }
                         )
                         .click(function(e) {
+                            // don't follow the link
 			    e.preventDefault();
+			    // get fresh state of the tabs list
+			    var lis = self.tablist.children( ":has(a[href])" );
+			    // get index of the tabs
                             var index = lis.index($(e.delegateTarget).parent().parent());
                             if (index > -1) {
                                 // remove this tab
                                 self._removeTab(index);
                             }
-                            // don't follow the link
-                            return false;
                         })
 			.end();
 		});
