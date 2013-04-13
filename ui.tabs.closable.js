@@ -47,7 +47,6 @@
 	    if( tab.hasClass( "ui-tabs-active" ) && this.tabs.length > 2 ) {
 	    	this._activate( index + ( index + 1 < this.tabs.length ? 1 : -1 ));
 	    };
-
 	    this._refresh();
 	    return this;
 	},
@@ -56,12 +55,14 @@
 	    this._super( "_processTabs" );
 	    var self = this;
 	    var lis = this.tablist.children( ":has(a[href])" );
+	    // remove annoying link outline at tabs title
 	    lis.children("a").css('outline', 'none');
 
 	    if (this.options.closable === true) {
-		var unclosable_lis = lis.filter(function() {
-                    return $('.ui-closable-tab', this).length === 0;
-		});
+	    	var unclosable_lis = lis.filter(function() {
+		    // return tabs which don't have '.ui-closable-tab' yet and also not marked with '.ui-unclosable-tab'
+                    return ($('.ui-closable-tab', this).length === 0 && $('.ui-unclosable-tab', this).length === 0);
+	    	});
 
 		// append the close button and associated events
 		unclosable_lis.each(function() {
