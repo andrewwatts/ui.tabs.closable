@@ -1,4 +1,3 @@
-
 Closable Tabs for jQuery UI
 =============================
 
@@ -19,11 +18,16 @@ How To Use
    overview at the [jQuery UI Tabs][jQuery UI Tabs] site to get an idea of
    what is possible. 
 1. Include the javascript file in your html file or js loader. eg:
+
         <script type="text/javascript" src="ui.tabs.closable.min.js"></script>
+        
 2. add a `closable` option when instatiating the tabs:
+
         $('#tabs').tabs({closable: true})
+        
 3. (optional) If you wish to receive a callback when the close button is 
    clicked you can add a `closableClick` function to the tab options:
+
         $('#tabs').tabs({
             closable: true,
             closableClick: function(event, ui) {
@@ -31,7 +35,16 @@ How To Use
                 // return false to prevent the remove
             }
         });
+        
+4. (optional) To set some not closable tabs just add `class="tab-notclosable"` class to the `<li>` element
     
+        <div id="tabs">
+            <ul>
+                <li class="tab-notclosable"><a href="#my-notclosable-tab">My Tab</a></li>
+            </ul>
+            <div id="my-notclosable"></div>
+        </div>
+
 That's it, about as unobtrusive as I could make it.
 
 
