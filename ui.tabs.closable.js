@@ -7,28 +7,28 @@
  * http://github.com/andrewwatts/ui.tabs.closable
  */
 (function() {
-    
-var ui_tabs_tabify = $.ui.tabs.prototype._tabify;
+
+var ui_tabs_tabify = $.ui.tabs.prototype._processTabs;
 
 $.extend($.ui.tabs.prototype, {
 
-    _tabify: function() {
+    _processTabs: function() {
         var self = this;
-
-        ui_tabs_tabify.apply(this, arguments);
+        
+		ui_tabs_tabify.apply(this, arguments);
 
         // if closable tabs are enable, add a close button
         if (self.options.closable === true) {
-
-            var unclosable_lis = this.lis.filter(function() {
+            
+			var unclosable_lis = this.tabs.filter(function() {
                 // return the lis that do not have a close button
                 return $('span.ui-icon-circle-close', this).length === 0;
             });
-
-            // append the close button and associated events
+            
+			// append the close button and associated events
             unclosable_lis.each(function() {
                 $(this)
-                    .append('<a href="#"><span class="ui-icon ui-icon-circle-close"></span></a>')
+                    .append('<a href="#" style="padding-top: 0.5em;padding-right: 0.2em;float:left;"><span class="ui-icon ui-icon-circle-close" style="display:inline-block;margin-left:-0.5em;" ></span></a>')
                     .find('a:last')
                         .hover(
                             function() {
@@ -39,13 +39,13 @@ $.extend($.ui.tabs.prototype, {
                             }
                         )
                         .click(function() {
-                            var index = self.lis.index($(this).parent());
+                            var index = self.tabs.index($(this).parent());
                             if (index > -1) {
                                 // call _trigger to see if remove is allowed
-                                if (false === self._trigger("closableClick", null, self._ui( $(self.lis[index]).find( "a" )[ 0 ], self.panels[index] ))) return;
+                                if (false === self._trigger("closableClick", null, $(self.tabs[index]).find( "a" )[ 0 ])) return;
 
                                 // remove this tab
-                                self.remove(index)
+                                self.tabs[index].remove();
                             }
 
                             // don't follow the link
